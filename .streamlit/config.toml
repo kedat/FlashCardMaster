@@ -1,9 +1,0 @@
-[server]
-headless = true
-address = "0.0.0.0"
-port = 5000
-
-[theme]
-primaryColor = "#4285F4"  # Google Blue
-secondaryBackgroundColor = "#F8F9FA"  # Light grey
-textColor = "#202124"  # Dark grey
