@@ -204,43 +204,17 @@ with st.sidebar:
         index=current_method_index,
         help="Chọn phương pháp AI phù hợp cho deployment online",
     )
-    st.session_state.ai_method = ai_method
-
-    # API Key cho Gemini
-    if ai_method in ["auto", "gemini"]:
+    st.session_state.ai_method = ai_method  # API Key cho Gemini
+    if ai_method == "gemini":
         api_key_input = st.text_input(
-            "Nhập Google Gemini API Key (tùy chọn):",
+            lang_manager.get_text("api_key_label"),
             type="password",
-            help="Chỉ cần nếu muốn sử dụng Gemini AI",
+            help=lang_manager.get_text("api_key_help"),
             value=st.session_state.api_key if st.session_state.api_key else "",
         )
 
         if api_key_input != st.session_state.api_key:
             st.session_state.api_key = api_key_input if api_key_input.strip() else None
-
-        # Local AI settings    if ai_method in ["auto", "local"]:
-        st.markdown(
-            "#### "
-            + lang_manager.get_text("local_ai_setup", default="Cài Đặt AI Local")
-        )
-        st.info(
-            "💡 "
-            + lang_manager.get_text(
-                "local_ai_info",
-                default="Cài đặt Ollama để sử dụng AI miễn phí trên máy của bạn",
-            )
-        )
-        if st.button(
-            lang_manager.get_text("ollama_guide", default="Hướng dẫn cài Ollama")
-        ):
-            st.markdown(
-                f"""
-            **{lang_manager.get_text("ollama_install", default="Cài đặt Ollama")}:**
-            1. {lang_manager.get_text("download_from", default="Tải về từ")}: https://ollama.ai
-            2. {lang_manager.get_text("run_command", default="Chạy lệnh")}: `ollama pull llama3.2:3b`
-            3. {lang_manager.get_text("start_service", default="Khởi động")}: `ollama serve`
-            """
-            )
 
     st.session_state.use_sample_cards = st.checkbox(
         lang_manager.get_text("use_sample_cards"),
@@ -249,7 +223,7 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    if ai_method in ["auto", "gemini"]:
+    if ai_method == "gemini":
         st.markdown(
             f"""
         ### {lang_manager.get_text("gemini_api_guide", default="Cách Lấy API Key Gemini (Miễn Phí)")}

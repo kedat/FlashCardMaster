@@ -91,15 +91,7 @@ class LanguageManager:
                     "online": "Sử dụng API AI miễn phí online (Cohere, Groq)",
                     "gemini": "Google Gemini (cần API key)",
                     "rule": "Tạo tự động không cần AI",
-                },
-                # Additional UI text
-                "local_ai_setup": "Cài Đặt AI Local",
-                "local_ai_info": "Cài đặt Ollama để sử dụng AI miễn phí trên máy của bạn",
-                "ollama_guide": "Hướng dẫn cài Ollama",
-                "ollama_install": "Cài đặt Ollama",
-                "download_from": "Tải về từ",
-                "run_command": "Chạy lệnh",
-                "start_service": "Khởi động",
+                },  # Additional UI text
                 "gemini_api_guide": "Cách Lấy API Key Gemini (Miễn Phí)",
                 "visit_studio": "Truy cập",
                 "login_google": "Đăng nhập bằng tài khoản Google",
@@ -190,15 +182,7 @@ class LanguageManager:
                     "online": "Use free online AI APIs (Cohere, Groq)",
                     "gemini": "Google Gemini (requires API key)",
                     "rule": "Auto-generate without AI",
-                },
-                # Additional UI text
-                "local_ai_setup": "Local AI Setup",
-                "local_ai_info": "Install Ollama to use free AI on your computer",
-                "ollama_guide": "Ollama Installation Guide",
-                "ollama_install": "Install Ollama",
-                "download_from": "Download from",
-                "run_command": "Run command",
-                "start_service": "Start service",
+                },  # Additional UI text
                 "gemini_api_guide": "How to Get Gemini API Key (Free)",
                 "visit_studio": "Visit",
                 "login_google": "Sign in with Google account",
