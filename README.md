@@ -13,10 +13,8 @@
 
 ### 🤖 AI Methods
 
-- **Auto**: Tự động chọn API AI miễn phí tốt nhất
 - **Online AI**: Sử dụng các API AI miễn phí (HuggingFace, etc.)
 - **Google Gemini**: High-quality AI với API key
-- **Rule-based**: Tạo tự động không cần AI
 
 ### 📝 Input Methods
 
@@ -118,7 +116,6 @@ CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0
 
 - **HuggingFace Inference API**: Completely free
 - **Google Gemini**: Free tier with API key
-- **Rule-based Generation**: No API required
 
 ### Adding New APIs
 

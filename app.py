@@ -36,7 +36,7 @@ if "api_key" not in st.session_state:
 if "use_sample_cards" not in st.session_state:
     st.session_state.use_sample_cards = False
 if "ai_method" not in st.session_state:
-    st.session_state.ai_method = "auto"
+    st.session_state.ai_method = "gemini"
 if "language" not in st.session_state:
     st.session_state.language = "vi"
 
@@ -183,7 +183,7 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")  # AI Method selection
-    ai_method_options = ["auto", "online", "gemini", "rule"]
+    ai_method_options = ["gemini"]
 
     # Get AI methods text safely
     ai_methods_dict = lang_manager.get_text("ai_methods")
@@ -204,7 +204,9 @@ with st.sidebar:
         index=current_method_index,
         help="Chọn phương pháp AI phù hợp cho deployment online",
     )
-    st.session_state.ai_method = ai_method  # API Key cho Gemini
+    st.session_state.ai_method = ai_method
+
+    # API Key cho Gemini
     if ai_method == "gemini":
         api_key_input = st.text_input(
             lang_manager.get_text("api_key_label"),
@@ -303,60 +305,19 @@ if st.session_state.view_mode == "input":
     if st.button(lang_manager.get_text("generate_btn"), key="generate_btn"):
         if not content_text.strip():
             st.error(lang_manager.get_text("content_required"))
-        else:  # Hiển thị spinner với message tùy theo method
-            spinner_messages = {
-                "auto": lang_manager.get_text("generating_auto"),
-                "online": "🌐 " + lang_manager.get_text("generating_online"),
-                "gemini": "🧠 " + lang_manager.get_text("generating_gemini"),
-                "rule": "📝 " + lang_manager.get_text("generating_rule"),
-            }
-
-            with st.spinner(
-                spinner_messages.get(
-                    st.session_state.ai_method, lang_manager.get_text("generating_auto")
-                )
-            ):
+        else:
+            with st.spinner("🧠 " + lang_manager.get_text("generating_gemini")):
                 try:
                     clear_flashcards()
-
-                    # Chọn phương pháp tạo flashcards dựa trên AI method
-                    if st.session_state.ai_method == "online":
-                        # Sử dụng online AI
-                        st.session_state.flashcards = (
-                            online_generator.generate_flashcards(
-                                content_text,
-                                subject,
-                                num_cards,
-                                st.session_state.language,
-                            )
-                        )
-                    elif st.session_state.ai_method == "rule":
-                        # Sử dụng rule-based
-                        st.session_state.flashcards = (
-                            online_generator.generate_rule_based_multilang(
-                                content_text,
-                                subject,
-                                num_cards,
-                                st.session_state.language,
-                            )
-                        )
-                    else:
-                        # Sử dụng phương pháp cũ (auto, gemini)
-                        use_local = st.session_state.ai_method == "auto"
-                        api_key = (
-                            st.session_state.api_key
-                            if st.session_state.ai_method in ["auto", "gemini"]
-                            else None
-                        )
-
-                        st.session_state.flashcards = generate_flashcards(
-                            content_text,
-                            subject,
-                            num_cards,
-                            api_key=api_key,
-                            use_sample_on_error=st.session_state.use_sample_cards,
-                            use_local_model=use_local,
-                        )
+                    # Sử dụng online_generator với Gemini API key
+                    api_key = st.session_state.api_key
+                    st.session_state.flashcards = online_generator.generate_flashcards(
+                        content_text,
+                        subject,
+                        num_cards,
+                        st.session_state.language,
+                        api_key,
+                    )
 
                     if st.session_state.flashcards:
                         st.success(
@@ -370,9 +331,8 @@ if st.session_state.view_mode == "input":
                     else:
                         st.error(lang_manager.get_text("error_creating"))
                 except Exception as e:
-                    st.error(
-                        lang_manager.get_text("error_with_fallback", error=str(e))
-                    )  # Thử fallback methods
+                    st.error(lang_manager.get_text("error_with_fallback", error=str(e)))
+                    # Thử fallback methods
                     if st.session_state.use_sample_cards:
                         st.warning(lang_manager.get_text("using_sample_fallback"))
                         st.session_state.flashcards = get_sample_flashcards(subject)[
@@ -383,44 +343,51 @@ if st.session_state.view_mode == "input":
 
 elif st.session_state.view_mode == "view":
     if not st.session_state.flashcards:
-        st.warning("Không có thẻ ghi nhớ nào để hiển thị")
+        st.warning(lang_manager.get_text("no_flashcards_to_display"))
         st.session_state.view_mode = "input"
         st.rerun()
 
-    st.header("Thẻ Ghi Nhớ")
+    st.header(lang_manager.get_text("flashcards_title"))
     # Save set controls
     save_col1, save_col2, save_col3 = st.columns([2, 1, 1])
     with save_col1:
-        set_name = st.text_input("Tên bộ thẻ:", key="set_name_input")
+        set_name = st.text_input(
+            lang_manager.get_text("set_name_label"), key="set_name_input"
+        )
     with save_col2:
-        if st.button("Lưu Bộ Thẻ", key="save_set_btn"):
+        if st.button(lang_manager.get_text("save_set_btn"), key="save_set_btn"):
             save_set(set_name)
     with save_col3:
         if st.session_state.current_set:
-            st.write(f"Bộ thẻ hiện tại: {st.session_state.current_set}")
+            st.write(
+                f"{lang_manager.get_text('current_set_label')}: {st.session_state.current_set}"
+            )
 
     # Display the current flashcard
     if st.session_state.flashcards:
-        current_card = st.session_state.flashcards[st.session_state.current_card_index]
-        # Edit mode
+        current_card = st.session_state.flashcards[
+            st.session_state.current_card_index
+        ]  # Edit mode
         if (
             st.session_state.edit_mode
             and st.session_state.edit_card_index == st.session_state.current_card_index
         ):
-            st.subheader("Chỉnh Sửa Thẻ Ghi Nhớ")
+            st.subheader(lang_manager.get_text("edit_flashcard_title"))
             edit_front = st.text_area(
-                "Mặt trước (Câu hỏi):", current_card.front, height=150
+                lang_manager.get_text("front_side_label"),
+                current_card.front,
+                height=150,
             )
             edit_back = st.text_area(
-                "Mặt sau (Câu trả lời):", current_card.back, height=150
+                lang_manager.get_text("back_side_label"), current_card.back, height=150
             )
 
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("Lưu Thay Đổi"):
+                if st.button(lang_manager.get_text("save_changes_btn")):
                     save_edit(edit_front, edit_back)
             with col2:
-                if st.button("Hủy"):
+                if st.button(lang_manager.get_text("cancel_btn")):
                     st.session_state.edit_mode = False
                     st.session_state.edit_card_index = None
                     st.rerun()
@@ -459,45 +426,55 @@ elif st.session_state.view_mode == "view":
                         st.markdown(
                             card_style.format(content=current_card.front),
                             unsafe_allow_html=True,
-                        )
-                    # Flip button under the card
-                    if st.button("Lật Thẻ", key="flip_btn"):
+                        )  # Flip button under the card
+                    if st.button(
+                        lang_manager.get_text("flip_card_btn"), key="flip_btn"
+                    ):
                         flip_card()
                         st.rerun()
             # Navigation controls
             nav_cols = st.columns([1, 1, 2, 1, 1])
             with nav_cols[0]:
-                if st.button("⬅️ Trước", key="prev_btn"):
+                if st.button(f"⬅️ {lang_manager.get_text('prev_btn')}", key="prev_btn"):
                     prev_card()
                     st.rerun()
             with nav_cols[1]:
-                if st.button("➡️ Tiếp", key="next_btn"):
+                if st.button(f"➡️ {lang_manager.get_text('next_btn')}", key="next_btn"):
                     next_card()
                     st.rerun()
             with nav_cols[3]:
-                if st.button("✏️ Sửa", key="edit_btn"):
+                if st.button(f"✏️ {lang_manager.get_text('edit_btn')}", key="edit_btn"):
                     enter_edit_mode(st.session_state.current_card_index)
             with nav_cols[4]:
-                if st.button("🗑️ Xóa", key="delete_btn"):
+                if st.button(
+                    f"🗑️ {lang_manager.get_text('delete_btn')}", key="delete_btn"
+                ):
                     delete_card(st.session_state.current_card_index)
 
             # Card counter
             st.write(
-                f"Thẻ {st.session_state.current_card_index + 1} trong {len(st.session_state.flashcards)}"
+                lang_manager.get_text(
+                    "card_counter",
+                    current=st.session_state.current_card_index + 1,
+                    total=len(st.session_state.flashcards),
+                )
             )
 
 elif st.session_state.view_mode == "sets":
-    st.header("Bộ Thẻ Ghi Nhớ Đã Lưu")
+    st.header(lang_manager.get_text("saved_sets_title"))
 
     if not st.session_state.sets:
-        st.info(
-            "Chưa có bộ thẻ ghi nhớ nào được lưu. Hãy tạo và lưu một số thẻ ghi nhớ trước!"
-        )
+        st.info(lang_manager.get_text("no_saved_sets_info"))
     else:
         # Display a table of saved sets
         set_data = []
         for set_name, cards in st.session_state.sets.items():
-            set_data.append({"Tên Bộ Thẻ": set_name, "Số Thẻ": len(cards)})
+            set_data.append(
+                {
+                    lang_manager.get_text("set_name_column"): set_name,
+                    lang_manager.get_text("card_count_column"): len(cards),
+                }
+            )
 
         if set_data:
             df = pd.DataFrame(set_data)
@@ -507,11 +484,14 @@ elif st.session_state.view_mode == "sets":
             col1, col2, col3 = st.columns(3)
             with col1:
                 selected_set = st.selectbox(
-                    "Chọn một bộ thẻ:", list(st.session_state.sets.keys())
+                    lang_manager.get_text("select_set_label"),
+                    list(st.session_state.sets.keys()),
                 )
             with col2:
-                if st.button("Tải Bộ Thẻ", key="load_set_btn"):
+                if st.button(lang_manager.get_text("load_set_btn"), key="load_set_btn"):
                     load_set(selected_set)
             with col3:
-                if st.button("Xóa Bộ Thẻ", key="delete_set_btn"):
+                if st.button(
+                    lang_manager.get_text("delete_set_btn"), key="delete_set_btn"
+                ):
                     delete_set(selected_set)

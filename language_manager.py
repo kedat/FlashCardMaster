@@ -98,7 +98,6 @@ class LanguageManager:
             "generate_btn": "Tạo Thẻ Ghi Nhớ",
             "content_required": "Vui lòng cung cấp nội dung để tạo thẻ ghi nhớ",
             "generating_auto": "Đang tự động chọn phương pháp tạo thẻ tốt nhất...",
-            "generating_online": "Đang tạo thẻ ghi nhớ bằng AI online...",
             "generating_gemini": "Đang tạo thẻ ghi nhớ bằng Gemini AI...",
             "generating_rule": "Đang tạo thẻ ghi nhớ tự động...",
             "success_created": "✅ Đã tạo {count} thẻ ghi nhớ thành công!",
@@ -143,10 +142,7 @@ class LanguageManager:
             
             # AI methods
             "ai_methods": {
-                "auto": "Tự động",
-                "online": "AI Online",
                 "gemini": "Google Gemini", 
-                "rule": "Tự động đơn giản",
             },
             "ai_method_help": {
                 "auto": "Tự động chọn API AI miễn phí tốt nhất",
